@@ -1,225 +1,156 @@
-# Word to PDF Splitter
+# 📄 Word to PDF Splitter
 
-A web-based application that allows users to upload a Word document (.doc/.docx) and split it into multiple PDF files with custom page ranges.
+A simple web application that splits Word documents into multiple PDF files based on custom page ranges.
 
-## Features
+## ✨ Features
 
-- 📤 **Easy File Upload**: Drag-and-drop or click to upload Word documents
-- 📄 **Automatic Conversion**: Converts Word files to PDF automatically
-- ✂️ **Custom Splitting**: Split PDF into multiple files with custom page ranges
-- 📝 **User-Friendly Interface**: Clean, modern UI with intuitive controls
-- ✅ **Error Handling**: Validates page ranges and handles errors gracefully
-- 📁 **Flexible Output**: Choose your own output folder and file names
+- 📤 **Upload Word Documents** - Drag & drop or browse (.doc/.docx)
+- ✂️ **Split by Page Range** - Create multiple PDFs from one document
+- 📦 **Bulk Configuration** - Generate multiple rows or paste from Excel
+- 💾 **Download as ZIP** - Get all your split PDFs in one file
+- 🎨 **Modern UI** - Clean, intuitive interface
+- ⚡ **Fast Processing** - Powered by LibreOffice
 
-## Requirements
+## 🚀 Quick Start
 
-- Python 3.7 or higher
-- Microsoft Word or LibreOffice (required for docx2pdf conversion)
-  - **macOS**: Requires Microsoft Word to be installed
-  - **Windows**: Works with Microsoft Word
-  - **Linux**: Requires LibreOffice (`sudo apt-get install libreoffice`)
+### Online Version (Recommended)
 
-## Installation
+Visit the live app: **[Word to PDF Splitter](https://word2pdfsplitter.up.railway.app/)**
 
-1. **Clone or download this repository**
+No installation needed! Just upload and split.
 
-2. **Navigate to the project directory**:
+### Local Installation
+
+1. **Clone the repository**
    ```bash
-   cd sibi_project
+   git clone https://github.com/sparrowitadmin/word2pdfsplitter.git
+   cd word2pdfsplitter
    ```
 
-3. **Create a virtual environment** (recommended):
-   ```bash
-   python3 -m venv venv
-   ```
-
-4. **Activate the virtual environment**:
-   - On macOS/Linux:
-     ```bash
-     source venv/bin/activate
-     ```
-   - On Windows:
-     ```bash
-     venv\Scripts\activate
-     ```
-
-5. **Install required packages**:
+2. **Install dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
-## Usage
+3. **Install LibreOffice** (required for Word to PDF conversion)
+   - **macOS**: `brew install --cask libreoffice`
+   - **Linux**: `sudo apt-get install libreoffice`
+   - **Windows**: Download from [libreoffice.org](https://www.libreoffice.org)
 
-### Starting the Application
-
-1. **Run the Flask application**:
+4. **Run the application**
    ```bash
    python app.py
    ```
 
-2. **Open your web browser** and navigate to:
+5. **Open your browser**
    ```
-   http://localhost:5000
+   http://localhost:5001
    ```
 
-### Using the Application
+## 📖 How to Use
 
-#### Step 1: Upload Word Document
-1. Click the "Choose File" button or drag and drop a Word document (.doc or .docx)
-2. Maximum file size: 50MB
-3. Wait for the file to upload and convert to PDF
-4. The application will display the total number of pages
+### Method 1: Manual Entry
 
-#### Step 2: Configure PDF Splits
-1. Click "Add Split" to add a new split configuration
-2. For each split, enter:
-   - **Output File Name**: Name for the output PDF (e.g., "chapter1.pdf")
-   - **Start Page**: First page to include (1-indexed)
-   - **End Page**: Last page to include (1-indexed)
-3. You can add multiple splits to create several PDF files
-4. Click "Remove" to delete a split configuration
-5. Page ranges are validated automatically
+1. **Upload** your Word document
+2. **Click "Add Split"** to add rows
+3. **Enter** filename, start page, and end page for each split
+4. **Click "Generate & Download PDFs"**
+5. **Extract** the downloaded ZIP file
 
-#### Step 3: Select Output Folder
-1. Enter the full path to the folder where you want to save the PDF files
-   - Example (Mac): `/Users/username/Documents/PDFs`
-   - Example (Windows): `C:\Users\username\Documents\PDFs`
-2. Make sure the folder exists before processing
+### Method 2: Bulk Configuration (Faster!)
 
-#### Step 4: Generate PDFs
-1. Click "Generate PDF Files" to start the splitting process
-2. Wait for processing to complete
-3. Review the results showing which files were created successfully
-4. Check the output folder for your generated PDF files
+1. **Upload** your Word document
+2. **Enter number of splits** and click "Generate Rows"
+3. **Prepare data in Excel** with 3 columns:
+   ```
+   filename     start_page    end_page
+   chapter1     1             5
+   chapter2     6             10
+   chapter3     11            15
+   ```
+4. **Copy from Excel**, paste into the text area
+5. **Click "Apply Pasted Data"** - table auto-fills!
+6. **Click "Generate & Download PDFs"**
 
-#### Step 5: Start Over
-1. Click "Start Over" to upload and process another document
+## 💡 Example
 
-## Example Usage
+Split a 20-page document into 3 PDFs:
 
-### Scenario: Split a 20-page document into 3 PDFs
+| File Name | Start Page | End Page |
+|-----------|------------|----------|
+| intro.pdf | 1 | 5 |
+| content.pdf | 6 | 15 |
+| conclusion.pdf | 16 | 20 |
 
-1. Upload your 20-page Word document
-2. Configure splits:
-   - **Split 1**:
-     - File name: `introduction.pdf`
-     - Start page: 1
-     - End page: 5
-   - **Split 2**:
-     - File name: `main_content.pdf`
-     - Start page: 6
-     - End page: 15
-   - **Split 3**:
-     - File name: `conclusion.pdf`
-     - Start page: 16
-     - End page: 20
-3. Enter output folder: `/Users/username/Documents/PDFs`
-4. Click "Generate PDF Files"
-5. Three PDF files will be created in your output folder
+Result: Download `split_pdfs.zip` containing all 3 files.
 
-## Error Handling
-
-The application handles various error scenarios:
-
-- ❌ **Invalid file type**: Only .doc and .docx files are accepted
-- ❌ **File too large**: Maximum 50MB file size
-- ❌ **Invalid page ranges**: Start page must be ≤ end page
-- ❌ **Page out of bounds**: End page cannot exceed total pages
-- ❌ **Missing output folder**: Output folder must exist
-- ❌ **Empty configurations**: At least one split must be configured
-- ❌ **Conversion errors**: Handles Word to PDF conversion failures
-
-## Project Structure
-
-```
-sibi_project/
-│
-├── app.py                      # Flask backend application
-├── requirements.txt            # Python dependencies
-├── README.md                   # This file
-│
-├── templates/
-│   └── index.html             # Main HTML template
-│
-├── static/
-│   ├── css/
-│   │   └── style.css          # Application styles
-│   └── js/
-│       └── script.js          # Frontend JavaScript
-│
-└── sample_document.docx       # Sample Word file for testing
-```
-
-## Technology Stack
+## 🛠️ Technology
 
 - **Backend**: Python, Flask
-- **PDF Processing**: pypdf (formerly PyPDF2)
-- **Word to PDF Conversion**: docx2pdf, python-docx
-- **Frontend**: HTML5, CSS3, JavaScript (Vanilla)
-- **UI Design**: Modern gradient design with responsive layout
+- **PDF Processing**: pypdf
+- **Conversion**: LibreOffice (via subprocess)
+- **Frontend**: HTML5, CSS3, Vanilla JavaScript
+- **Deployment**: Docker, Railway/Render compatible
 
-## Troubleshooting
+## 📦 Deployment
 
-### Issue: "Failed to convert Word document to PDF"
+The app includes deployment configurations for:
 
-**Solution**: 
-- **macOS**: Make sure Microsoft Word is installed
-- **Windows**: Make sure Microsoft Word is installed
-- **Linux**: Install LibreOffice:
-  ```bash
-  sudo apt-get install libreoffice
-  ```
+- **Railway** (recommended) - `Dockerfile` included
+- **Render** - `render.yaml` included  
+- **Heroku** - `Procfile` included
+- **Docker** - Ready to containerize
 
-### Issue: "Output folder does not exist"
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
 
-**Solution**: Create the folder first or use an existing folder path
+## ❓ FAQ
 
-### Issue: Port 5000 already in use
+**Q: What file types are supported?**  
+A: .doc and .docx files up to 50MB
 
-**Solution**: 
-- Stop other applications using port 5000
-- Or modify `app.py` to use a different port:
-  ```python
-  app.run(debug=True, port=5001)  # Change to 5001 or any available port
-  ```
+**Q: Where are my files stored?**  
+A: Files are processed in memory/temp folders and automatically deleted after processing
 
-### Issue: Permission denied when saving files
+**Q: Can I split multiple documents at once?**  
+A: Currently one document at a time. Batch processing coming soon!
 
-**Solution**: Make sure you have write permissions to the output folder
+**Q: Is my data secure?**  
+A: Yes! Files are processed temporarily and immediately deleted. Nothing is permanently stored.
 
-## Security Notes
+## 🐛 Troubleshooting
 
-- The application stores uploaded files temporarily and cleans them up after processing
-- Maximum file size is limited to 50MB
-- File uploads are validated for correct file types
-- All filenames are sanitized using `secure_filename()`
+**Conversion fails?**
+- Make sure LibreOffice is installed
+- Try restarting the application
 
-## Limitations
+**Can't download?**
+- Check your browser's download settings
+- Try a different browser
 
-- Maximum file size: 50MB
-- Supported formats: .doc, .docx only
-- Output format: PDF only
-- Requires Microsoft Word (Windows/Mac) or LibreOffice (Linux) for conversion
+**Page range errors?**
+- Ensure start page ≤ end page
+- Ensure end page doesn't exceed total pages
 
-## Future Enhancements
+## 📝 License
 
-Potential improvements for future versions:
-- Support for other input formats (RTF, ODT)
-- Batch processing of multiple Word files
-- PDF merging functionality
-- Cloud storage integration
-- Docker containerization for easier deployment
-- Command-line interface (CLI) option
+MIT License - Free to use and modify
 
-## License
+## 🤝 Contributing
 
-This project is provided as-is for educational and personal use.
+Contributions are welcome! Feel free to:
+- Report bugs
+- Suggest features
+- Submit pull requests
 
-## Support
+## 📧 Support
 
-For issues or questions, please refer to the troubleshooting section or check the error messages displayed in the application.
+For issues or questions:
+- Check the [Issues](https://github.com/sparrowitadmin/word2pdfsplitter/issues) page
+- Read the [QUICKSTART.md](QUICKSTART.md) guide
+- Review [USAGE_EXAMPLES.md](USAGE_EXAMPLES.md)
 
 ---
 
-**Created with ❤️ using Flask and Python**
+**Made with ❤️ using Flask and Python**
 
+[Try it now →](https://word2pdfsplitter.up.railway.app/)

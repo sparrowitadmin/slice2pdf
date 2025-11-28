@@ -51,3 +51,8 @@ temp/
 *.pdf
 !sample_*.pdf
 
+# Archived files (local only)
+README_archived.md
+*_archived.*
+app_new.py
+
