@@ -2,6 +2,8 @@ import os
 import json
 import subprocess
 import platform
+import zipfile
+from io import BytesIO
 from flask import Flask, render_template, request, jsonify, send_file
 from werkzeug.utils import secure_filename
 from docx import Document
@@ -106,19 +108,24 @@ def convert_word_to_pdf(word_path, pdf_path):
     print(f"Error: All conversion methods failed. Please install LibreOffice or Microsoft Word.")
     return False
 
-def split_pdf(source_pdf, splits_config, output_folder):
+def split_pdf(source_pdf, splits_config, output_folder=None):
     """
     Split PDF into multiple files based on page ranges.
     
     Args:
         source_pdf: Path to source PDF
         splits_config: List of dicts with 'filename', 'start_page', 'end_page'
-        output_folder: Destination folder for output PDFs
+        output_folder: Destination folder for output PDFs (optional, uses temp if None)
     
     Returns:
-        List of created files or error messages
+        Tuple of (results list, list of created file paths)
     """
     results = []
+    created_files = []
+    
+    # Use temp folder if no output folder specified
+    if output_folder is None:
+        output_folder = tempfile.gettempdir()
     
     try:
         reader = PdfReader(source_pdf)
@@ -172,6 +179,7 @@ def split_pdf(source_pdf, splits_config, output_folder):
                 with open(output_path, 'wb') as output_file:
                     writer.write(output_file)
                 
+                created_files.append(output_path)
                 results.append({
                     'filename': filename,
                     'status': 'success',
@@ -185,10 +193,10 @@ def split_pdf(source_pdf, splits_config, output_folder):
                     'message': f'Error writing file: {str(e)}'
                 })
         
-        return results
+        return results, created_files
     
     except Exception as e:
-        return [{'status': 'error', 'message': f'Error reading PDF: {str(e)}'}]
+        return [{'status': 'error', 'message': f'Error reading PDF: {str(e)}'}], []
 
 @app.route('/')
 def index():
@@ -245,28 +253,17 @@ def upload_file():
 
 @app.route('/process', methods=['POST'])
 def process_splits():
-    """Process the PDF splitting based on user input."""
+    """Process the PDF splitting and return as ZIP file."""
     try:
         data = request.json
         session_id = data.get('session_id')
         splits = data.get('splits', [])
-        output_folder = data.get('output_folder', '')
         
         if not session_id:
             return jsonify({'error': 'Invalid session'}), 400
         
         if not splits:
             return jsonify({'error': 'No split configurations provided'}), 400
-        
-        if not output_folder:
-            return jsonify({'error': 'Output folder not specified'}), 400
-        
-        # Validate output folder
-        if not os.path.exists(output_folder):
-            return jsonify({'error': 'Output folder does not exist'}), 400
-        
-        if not os.path.isdir(output_folder):
-            return jsonify({'error': 'Output path is not a directory'}), 400
         
         # Get PDF path
         pdf_filename = f"converted_{session_id}.pdf"
@@ -275,8 +272,31 @@ def process_splits():
         if not os.path.exists(pdf_path):
             return jsonify({'error': 'Source file not found. Please upload again.'}), 400
         
-        # Process splits
-        results = split_pdf(pdf_path, splits, output_folder)
+        # Process splits (use temp folder)
+        temp_output = tempfile.mkdtemp()
+        results, created_files = split_pdf(pdf_path, splits, temp_output)
+        
+        # Check if any succeeded
+        success_count = sum(1 for r in results if r['status'] == 'success')
+        
+        if success_count == 0:
+            # Clean up
+            shutil.rmtree(temp_output, ignore_errors=True)
+            return jsonify({
+                'success': False,
+                'results': results,
+                'message': 'No PDF files were created successfully'
+            }), 400
+        
+        # Create ZIP file in memory
+        memory_file = BytesIO()
+        with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
+            for file_path in created_files:
+                if os.path.exists(file_path):
+                    arcname = os.path.basename(file_path)
+                    zf.write(file_path, arcname=arcname)
+        
+        memory_file.seek(0)
         
         # Clean up temporary files
         word_path = os.path.join(app.config['UPLOAD_FOLDER'], f"upload_{session_id}")
@@ -284,15 +304,15 @@ def process_splits():
             os.remove(word_path)
         if os.path.exists(pdf_path):
             os.remove(pdf_path)
+        shutil.rmtree(temp_output, ignore_errors=True)
         
-        # Check if any succeeded
-        success_count = sum(1 for r in results if r['status'] == 'success')
-        
-        return jsonify({
-            'success': success_count > 0,
-            'results': results,
-            'message': f'Successfully created {success_count} of {len(splits)} PDF files'
-        })
+        # Send ZIP file
+        return send_file(
+            memory_file,
+            mimetype='application/zip',
+            as_attachment=True,
+            download_name='split_pdfs.zip'
+        )
     
     except Exception as e:
         return jsonify({'error': f'Unexpected error: {str(e)}'}), 500

@@ -133,14 +133,6 @@ function validatePageRange(input) {
 
 // Process splits and generate PDFs
 async function processSplits() {
-    const outputFolder = document.getElementById('output-folder').value.trim();
-    
-    // Validate output folder
-    if (!outputFolder) {
-        alert('Please enter an output folder path');
-        return;
-    }
-    
     // Get all split configurations
     const tbody = document.getElementById('splits-tbody');
     const rows = tbody.rows;
@@ -197,16 +189,38 @@ async function processSplits() {
             },
             body: JSON.stringify({
                 session_id: sessionId,
-                splits: splits,
-                output_folder: outputFolder
+                splits: splits
             })
         });
         
-        const data = await response.json();
-        
-        if (response.ok && data.success) {
-            displayResults(data.results, data.message);
+        if (response.ok) {
+            // Check if response is a ZIP file
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/zip')) {
+                // Download the ZIP file
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'split_pdfs.zip';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                // Show success message
+                displayResults([{
+                    filename: 'split_pdfs.zip',
+                    status: 'success',
+                    message: `Successfully created ${splits.length} PDF file(s). Download started!`
+                }], `✅ Success! Your PDFs have been downloaded as a ZIP file.`);
+            } else {
+                // Handle JSON error response
+                const data = await response.json();
+                alert('Error: ' + (data.error || 'Processing failed'));
+            }
         } else {
+            const data = await response.json();
             alert('Error: ' + (data.error || 'Processing failed'));
         }
     } catch (error) {
