@@ -322,7 +322,7 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5001))
     debug = os.environ.get('DEBUG', 'False').lower() == 'true'
     
-    print("Starting Word to PDF Splitter Application")
+    print("Starting Slice2PDF Application")
     if debug:
         print(f"Open your browser and navigate to: http://localhost:{port}")
     

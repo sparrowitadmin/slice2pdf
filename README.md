@@ -1,4 +1,4 @@
-# 📄 Word to PDF Splitter
+# 📄 Slice2PDF
 
 A simple web application that splits Word documents into multiple PDF files based on custom page ranges.
 
@@ -15,7 +15,7 @@ A simple web application that splits Word documents into multiple PDF files base
 
 ### Online Version (Recommended)
 
-Visit the live app: **[Word to PDF Splitter](https://word2pdfsplitter.up.railway.app/)**
+Visit the live app: **[Slice2PDF](https://slice2pdf.up.railway.app/)**
 
 No installation needed! Just upload and split.
 
@@ -23,8 +23,8 @@ No installation needed! Just upload and split.
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/sparrowitadmin/word2pdfsplitter.git
-   cd word2pdfsplitter
+   git clone https://github.com/sparrowitadmin/Slice2PDF.git
+   cd Slice2PDF
    ```
 
 2. **Install dependencies**
@@ -147,7 +147,7 @@ Contributions are welcome! Feel free to:
 ## 📧 Support
 
 For issues or questions:
-- Check the [Issues](https://github.com/sparrowitadmin/word2pdfsplitter/issues) page
+- Check the [Issues](https://github.com/sparrowitadmin/Slice2PDF/issues) page
 - Read the [QUICKSTART.md](QUICKSTART.md) guide
 - Review [USAGE_EXAMPLES.md](USAGE_EXAMPLES.md)
 
@@ -155,4 +155,4 @@ For issues or questions:
 
 **Made with Passion @ SurveySparrow**
 
-[Try it now →](https://word2pdfsplitter.up.railway.app/)
+[Try it now →](https://slice2pdf.up.railway.app/)
