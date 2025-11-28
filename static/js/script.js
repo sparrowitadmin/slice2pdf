@@ -277,9 +277,6 @@ function resetApp() {
     // Clear splits table
     document.getElementById('splits-tbody').innerHTML = '';
     
-    // Clear output folder
-    document.getElementById('output-folder').value = '';
-    
     // Reset status
     uploadStatus.className = 'status-message';
     uploadStatus.textContent = '';
